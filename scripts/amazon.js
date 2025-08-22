@@ -66,6 +66,7 @@ function updateCartQuantity() {
     });
 
     document.querySelector('.js-cart-quantity').innerHTML= cartQuantity;
+    localStorage.setItem("cartQuantity", cartQuantity);
 };
 
 document.querySelector('.js-products-grid').innerHTML = productsHTML;
@@ -78,3 +79,8 @@ document.querySelectorAll('.js-add-to-cart')
             updateCartQuantity();            
         });
     });
+
+window.onload = () => {
+    const cartStorage = localStorage.getItem('cartQuantity');
+    document.querySelector('.js-cart-onload').innerHTML = `${cartStorage}`;
+};
