@@ -1,4 +1,4 @@
-import {calculateCartQuantity, cart, removeFromCart, updateQuantity} from '../data/cart.js'
+import {calculateCartQuantity, cart, removeFromCart, updateQuantity, updateDeliveryOption} from '../data/cart.js'
 import { products } from '../data/products.js';
 import { formatCurrency } from './utils/money.js';
 import dayjs from 'https://unpkg.com/supersimpledev@8.5.0/dayjs/esm/index.js';
@@ -12,14 +12,14 @@ function updateCartQuantityCheckout() {
 let cartSummaryHTML = '';
 
 cart.forEach((cartItem) => {
-const productId = cartItem.productId;
+  const productId = cartItem.productId;
 
-let matchingProduct;
+  let matchingProduct;
 
-products.forEach((product) => {
-    if (product.id === productId) {
-        matchingProduct = product;
-    }
+  products.forEach((product) => {
+      if (product.id === productId) {
+          matchingProduct = product;
+      }
 });
 
 const deliveryOptionId = cartItem.deliveryOptionId;
@@ -60,7 +60,7 @@ cartSummaryHTML += `
                   <span class="update-quantity-link link-primary js-update-quantity-link" data-product-id="${matchingProduct.id}">
                     Update
                   </span>
-                  <input class="quantity-input js-quantity-input-${matchingProduct.id}" data-product-id="${matchingProduct.id}">
+                  <input name="update-input" class="quantity-input js-quantity-input-${matchingProduct.id}" data-product-id="${matchingProduct.id}">
                   <span class="save-quantity-link link-primary js-save-quantity-link" data-product-id="${matchingProduct.id}">
                     Save
                   </span>
@@ -90,11 +90,11 @@ function deliveryOptionsHTML(matchingProduct, cartItem) {
     const dateString = deliveryDate.format('dddd, MMMM D');
     const priceString = deliveryOption.priceCents === 0 
       ? 'FREE'
-      : `$${formatCurrency(deliveryOption.priceCents)} - ,`;
+      : `$${formatCurrency(deliveryOption.priceCents)} - `;
 
       const isChecked = deliveryOption.id === cartItem.deliveryOptionId;
       html += `
-      <div class="delivery-option">
+      <div class="delivery-option js-delivery-option" data-product-id="${matchingProduct.id}" data-delivery-option-id = "${deliveryOption.id}">
         <input type="radio"
           ${isChecked ? 'checked' : ''}
           class="delivery-option-input"
@@ -150,3 +150,10 @@ document.querySelectorAll('.js-save-quantity-link').forEach((link) =>{
     
   });
 });
+
+document.querySelectorAll('js-delivery-option').forEach((element) => {
+  element.addEventListener('click', () => {
+    const {productId, deliveryOptionId} = element.dataset;
+    updateDeliveryOption(productId, deliveryOptionId);
+  });
+})
